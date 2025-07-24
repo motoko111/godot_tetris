@@ -19,13 +19,13 @@ var piece_bag: Array = []
 var base_fall_interval := 0.5  # 初期速度（秒）
 var fall_interval_rate := 0.0001  # スコア加算ごとの減衰係数
 
-# 仮想ボタンの定義（レイアウト調整後）
+# 仮想ボタンの定義（新ラベル）
 var virtual_buttons = {
-	"←": Rect2i(),
-	"→": Rect2i(),
-	"↓": Rect2i(),
-	"↑": Rect2i(),
-	"⟳": Rect2i()
+	"LEFT": Rect2i(),
+	"RIGHT": Rect2i(),
+	"DOWN": Rect2i(),
+	"ROTATE": Rect2i(),
+	"DROP": Rect2i()
 }
 
 const SHAPES = [
@@ -89,12 +89,13 @@ func _input(event):
 			return
 		for label in virtual_buttons.keys():
 			if virtual_buttons[label].has_point(event.position):
+				# _input 内の判定も修正
 				match label:
-					"←": move(Vector2i(-1, 0))
-					"→": move(Vector2i(1, 0))
-					"↓": move(Vector2i(0, 1))
-					"↑": hard_drop()
-					"⟳": rotate()
+					"LEFT": move(Vector2i(-1, 0))
+					"RIGHT": move(Vector2i(1, 0))
+					"DOWN": move(Vector2i(0, 1))
+					"ROTATE": rotate()
+					"DROP": hard_drop()
 				break
 		queue_redraw()
 
@@ -127,11 +128,11 @@ func _draw():
 	var center_x = btn_w * 1.5
 	var center_y = area_top + btn_h
 
-	virtual_buttons["↑"] = Rect2i(Vector2i(center_x, center_y - btn_h), Vector2i(btn_w, btn_h))
-	virtual_buttons["←"] = Rect2i(Vector2i(center_x - btn_w, center_y), Vector2i(btn_w, btn_h))
-	virtual_buttons["→"] = Rect2i(Vector2i(center_x + btn_w, center_y), Vector2i(btn_w, btn_h))
-	virtual_buttons["↓"] = Rect2i(Vector2i(center_x, center_y + btn_h), Vector2i(btn_w, btn_h))
-	virtual_buttons["⟳"] = Rect2i(Vector2i(size.x - btn_w * 1.5, center_y), Vector2i(btn_w, btn_h))
+	virtual_buttons["DROP"] = Rect2i(Vector2i(center_x, center_y - btn_h), Vector2i(btn_w, btn_h))
+	virtual_buttons["LEFT"] = Rect2i(Vector2i(center_x - btn_w, center_y), Vector2i(btn_w, btn_h))
+	virtual_buttons["RIGHT"] = Rect2i(Vector2i(center_x + btn_w, center_y), Vector2i(btn_w, btn_h))
+	virtual_buttons["DOWN"] = Rect2i(Vector2i(center_x, center_y + btn_h), Vector2i(btn_w, btn_h))
+	virtual_buttons["ROTATE"] = Rect2i(Vector2i(size.x - btn_w * 1.5, center_y), Vector2i(btn_w, btn_h))
 
 	for label in virtual_buttons.keys():
 		var rect = virtual_buttons[label]
