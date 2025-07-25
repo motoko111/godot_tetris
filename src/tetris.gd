@@ -3,7 +3,7 @@ extends Control
 const BOARD_WIDTH := 10
 const BOARD_HEIGHT := 20
 const SIDE_UI_WIDTH := 4  # 左右に各4マス分のUIスペース
-const VIRTUAL_BUTTON_HEIGHT := 160
+const VIRTUAL_BUTTON_HEIGHT := 200
 
 var BLOCK_SIZE := 24
 var board_margin := Vector2i(0, 0)
@@ -267,19 +267,27 @@ func lock_piece():
 			board[p.y][p.x] = current_color
 
 func clear_lines():
-	var cleared = 0
+	var new_board := []
+	var cleared := 0
+
 	for y in range(BOARD_HEIGHT - 1, -1, -1):
-		if board[y].all(func(v): return v != null):
-			for yy in range(y, 0, -1):
-				board[yy] = board[yy - 1]
-			board[0] = []
-			board[0].resize(BOARD_WIDTH)
-			for x in range(BOARD_WIDTH):
-				board[0][x] = null
-			y += 1
-			cleared += 1
+		if board[y].any(func(v): return v == null):
+			new_board.insert(0, board[y])  # 残す行は上に積む
+		else:
+			cleared += 1  # 完全に埋まった行はスキップ（＝削除）
+
+	# 空行を上に追加して BOARD_HEIGHT に揃える
+	while new_board.size() < BOARD_HEIGHT:
+		var empty_row := []
+		for x in range(BOARD_WIDTH):
+			empty_row.append(null)
+		new_board.insert(0, empty_row)
+
+	board = new_board
 	score += cleared * 100
-	
+	update_level()
+
+func update_level():
 	# 落下速度をスコアに応じて速くする
 	fall_interval = max(0.1, base_fall_interval - score * fall_interval_rate)
 
